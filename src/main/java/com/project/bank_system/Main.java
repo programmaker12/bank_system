@@ -1,7 +1,9 @@
 package com.project.bank_system;
 
 import com.project.bank_system.exceptions.InsufficientFundsException;
+import com.project.bank_system.repository.AccountRepository;
 import com.project.bank_system.service.*;
+//import com.project.bank_system.util.DataGenerator;
 
 import java.math.BigDecimal;
 
@@ -106,31 +108,33 @@ public class Main {
 //        }
 //        int x=5; int y=++x + x++ + --x;
 //        System.out.println(y);
-        int i = 0;
-        for(; i < 5; i++);
-        System.out.println(i);
+//        int i = 0;
+//        for(; i < 5; i++);
+//        System.out.println(i);
 
 //        updater1.join();
 //        updater2.join();
 //        reader.join();
+
     }
 
-    private static void runConcurrentWithdrawals(Bank bank) throws InterruptedException {
-        Thread t1 = new Thread(() -> bank.withdrawAmount("Yash", new BigDecimal("500")));
-        Thread t2 = new Thread(() -> {
-            try {
-                bank.withdrawAmount("Yash", new BigDecimal("700"));
-            } catch (InsufficientFundsException e) {
-                System.out.println(e.getMessage());
-            }
-        });
+//    private static void runConcurrentWithdrawals(Bank bank) throws InterruptedException {
+//        Thread t1 = new Thread(() -> bank.withdrawAmount("Yash", new BigDecimal("500")));
+//        Thread t2 = new Thread(() -> {
+//            try {
+//                bank.withdrawAmount("Yash", new BigDecimal("700"));
+//            } catch (InsufficientFundsException e) {
+//                System.out.println(e.getMessage());
+//            }
+//        });
+//
+//        t1.start();
+//        t2.start();
+//
+//        t1.join();
+//        t2.join();
+//
+//        System.out.println("Balance after transactions: " + bank.getUserBalance("Yash"));
+//    }
 
-        t1.start();
-        t2.start();
-
-        t1.join();
-        t2.join();
-
-        System.out.println("Balance after transactions: " + bank.getUserBalance("Yash"));
-    }
 }
