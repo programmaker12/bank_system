@@ -2,6 +2,8 @@ package com.project.bank_system.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "accounts")
@@ -19,6 +21,18 @@ public class Account {
 
     @Column(nullable = false)
     private String status; // e.g., ACTIVE, INACTIVE
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
+    @OneToMany(mappedBy = "accountId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions;
+
 
     // ✅ Constructors
     public Account() {}
@@ -52,4 +66,6 @@ public class Account {
                 ", status='" + status + '\'' +
                 '}';
     }
+
+
 }

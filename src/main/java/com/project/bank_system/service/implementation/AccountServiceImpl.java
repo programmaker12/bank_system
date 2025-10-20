@@ -4,8 +4,10 @@ import com.project.bank_system.entity.Account;
 import com.project.bank_system.dto.AccountDTO;
 import com.project.bank_system.repository.AccountRepository;
 import com.project.bank_system.service.interfaces.AccountService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,11 +22,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Cacheable(value = "accounts")
     public List<Account> getAllAccounts() {
         return accountRepository.findAll();
     }
 
     @Override
+    @Cacheable(value = "accounts", key = "#username")
     public Account getAccountByUsername(String username) {
         return accountRepository.findByUsername(username);
     }
@@ -35,8 +39,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<AccountDTO> getActiveAccountSummaries() {
-        return accountRepository.findActiveAccountSummaries();
+    public Page<AccountDTO> getAllAccountSummaries(Pageable pageable) {
+        // Simply call repository method with Pageable
+        return accountRepository.findActiveAccountSummaries(pageable);
     }
 
     @Override

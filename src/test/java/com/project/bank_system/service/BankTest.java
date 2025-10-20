@@ -1,20 +1,33 @@
 package com.project.bank_system.service;
 
+import com.project.bank_system.entity.Account;
 import com.project.bank_system.exceptions.InsufficientFundsException;
-
-import com.project.bank_system.service.Bank;
+import com.project.bank_system.repository.AccountRepository;
+import jakarta.persistence.EntityManager;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class BankTest {
 
     private Bank bank;
 
+    @Autowired
+    private AccountRepository accountRepository;
+    @Autowired
+    private EntityManager entityManager;
     @BeforeEach
     void setUp() {
         bank = new Bank();
@@ -65,7 +78,7 @@ class BankTest {
     }
 
     @Test
-    void  testCreateUserSuccessfully() {
+    void testCreateUserSuccessfully() {
         bank.createUser("Amit");
         assertEquals(BigDecimal.ZERO, bank.getUserBalance("Amit"));
     }
@@ -122,7 +135,34 @@ class BankTest {
         BigDecimal finalBalance = bank.getUserBalance("Yash");
         System.out.println("Final Balance after concurrent withdrawals: " + finalBalance);
 
-        // Either one withdrawal succeeds or both partially fail safely
         assertTrue(finalBalance.compareTo(BigDecimal.ZERO) >= 0);
+    }
+
+    // ✅ Fix LazyInitializationException and N+1 problem
+    @Test
+    @Transactional
+    public void testNPlusOne() {
+        List<Account> accounts = accountRepository.findAllWithTransactions(PageRequest.of(0, 10));
+        // Access transactions safely inside a transaction
+        for (Account acc : accounts) {
+            System.out.println("Account: " + acc.getUsername() + ", Transactions: " + acc.getTransactions().size());
+        }
+    }
+
+
+    @Test
+    @Transactional
+    public void testNPlusOneWithStats() {
+        SessionFactory sessionFactory = entityManager.getEntityManagerFactory().unwrap(SessionFactory.class);
+        Statistics stats = sessionFactory.getStatistics();
+        stats.setStatisticsEnabled(true);
+        stats.clear();
+
+        List<Account> accounts = accountRepository.findAllWithTransactions(PageRequest.of(0, 10)); // lazy
+        for (Account acc : accounts) {
+            acc.getTransactions().size();
+        }
+
+        System.out.println("Number of queries executed: " + stats.getPrepareStatementCount());
     }
 }

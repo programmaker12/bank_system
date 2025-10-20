@@ -3,6 +3,7 @@ package com.project.bank_system.service.interfaces;
 import com.project.bank_system.dto.AccountDTO;
 import com.project.bank_system.entity.Account;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface AccountService {
     List<Account> getAllActiveAccounts();
 
     // Fetch only username and balance for optimization
-    List<AccountDTO> getActiveAccountSummaries();
+    Page<AccountDTO> getAllAccountSummaries(Pageable pageable);
 
     Page<Account> getAllAccountsPaged(int page, int size);
 }
